@@ -21,15 +21,20 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /home/ubuntu
-            if [ ! -d "cloud-fullstack-laravel" ]; then
-              git clone https://github.com/galangam/laravel-cloud-devops.git cloud-fullstack-laravel
+
+            if [ ! -d "laravel-cloud-devops" ]; then
+              git clone https://github.com/galangam/laravel-cloud-devops.git
             fi
 
-            cd cloud-fullstack-laravel/app
+            cd laravel-cloud-devops
             git pull origin main
 
             docker stop laravel-app || true
             docker rm laravel-app || true
 
             docker build -t laravel-devops .
-            docker run -d -p 80:8000 --name laravel-app laravel-devops
+            docker run -d \
+              --name laravel-app \
+              -p 80:8000 \
+              --env-file .env \
+              laravel-devops
